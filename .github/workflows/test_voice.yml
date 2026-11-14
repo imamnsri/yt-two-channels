@@ -1,0 +1,83 @@
+
+name: Test YouTube AI Voices
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-voices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Edge TTS
+        run: python -m pip install edge-tts
+
+      - name: Create test narration files
+        shell: bash
+        run: |
+          mkdir -p output
+          python - <<'PY'
+          import json
+
+          samples = {
+              "vice_city_short": {
+                  "narration": (
+                      "Welcome to Vice City Unlocked! "
+                      "Here we explore officially confirmed "
+                      "Grand Theft Auto Six information "
+                      "and original gaming commentary."
+                  )
+              },
+              "kidzz_rhythm_long": {
+                  "narration": (
+                      "Hello, little stars! Welcome to Kidzz Rhythm. "
+                      "Let's count together. One bright star, "
+                      "two little clouds, three happy butterflies. "
+                      "Learning is fun when we play together!"
+                  )
+              }
+          }
+
+          for name, content in samples.items():
+              with open(
+                  f"output/{name}.json",
+                  "w",
+                  encoding="utf-8"
+              ) as file:
+                  json.dump(content, file)
+
+          print("Test narration files created.")
+          PY
+
+      - name: Generate Vice City voice
+        run: python scripts/generate_voice.py vice_city short
+
+      - name: Generate Kidzz Rhythm voice
+        run: python scripts/generate_voice.py kidzz_rhythm long
+
+      - name: Verify audio files
+        shell: bash
+        run: |
+          test -s output/vice_city_short.mp3
+          test -s output/kidzz_rhythm_long.mp3
+          echo "Both audio files were created."
+
+      - name: Save voice samples
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-voice-samples
+          path: output/*.mp3
+          retention-days: 1
+          if-no-files-found: error
