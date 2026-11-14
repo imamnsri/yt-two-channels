@@ -11,23 +11,22 @@ CHANNELS = {
     "vice_city": {
         "name": "Vice City - Unlocked",
         "instructions": (
-            "Create original GTA 6 commentary for a US audience. "
+            "Write original GTA 6 commentary for a US audience. "
             "Only present officially confirmed Rockstar Games "
-            "information as fact. Do not invent announcements, "
-            "release dates, features, or gameplay details. "
-            "If official source material is not supplied, "
-            "create evergreen commentary clearly labeled "
-            "as opinion or speculation, not breaking news."
+            "information as fact. Never invent news, release dates, "
+            "gameplay features, or announcements. "
+            "If official sources are not provided, create evergreen "
+            "opinion-based commentary clearly labeled as opinion. "
+            "Do not copy Rockstar footage or copyrighted scripts."
         ),
     },
     "kidzz_rhythm": {
         "name": "Kidzz Rhythm",
         "instructions": (
-            "Create an entirely original, age-appropriate "
-            "nursery rhyme or musical story for young children. "
-            "Use simple English, repetition, positive messages, "
-            "and an easy-to-follow narrative. "
-            "Do not copy existing copyrighted songs or lyrics."
+            "Create completely original nursery rhymes and "
+            "musical stories for young children. "
+            "Use simple US English, repetition, and positive "
+            "educational themes. Do not copy copyrighted lyrics."
         ),
     },
 }
@@ -41,31 +40,31 @@ def generate(channel, video_type):
         raise ValueError("Unknown channel")
 
     if video_type not in ("short", "long"):
-        raise ValueError("Video type must be short or long")
+        raise ValueError("Invalid video type")
 
     target_words = 110 if video_type == "short" else 650
 
     prompt = f"""
-You are writing for the YouTube channel:
-{CHANNELS[channel]['name']}
+You are creating an original YouTube script.
 
-Instructions:
+Channel: {CHANNELS[channel]['name']}
+Video type: {video_type}
+Target narration: approximately {target_words} words
+
+Requirements:
 {CHANNELS[channel]['instructions']}
 
-Video format: {video_type}
-Target narration length: approximately {target_words} words.
+Return ONLY a valid JSON object with:
+"title": YouTube title
+"description": YouTube description
+"narration": complete narration
+"visual_keywords": array of 5 stock-video search terms
 
-Return ONLY valid JSON with these fields:
-"title": engaging YouTube title
-"description": original YouTube description
-"narration": complete spoken script
-"visual_keywords": array of 5 safe stock-footage search terms
-
-Use US English. Avoid misleading claims.
+Use US English.
 """
 
     model = os.environ.get(
-        "GEMINI_MODEL", "gemini-2.5-flash"
+        "GEMINI_MODEL", "gemini-2.5-flash-lite"
     )
 
     url = (
@@ -97,17 +96,44 @@ Use US English. Avoid misleading claims.
             request, timeout=90
         ) as response:
             result = json.load(response)
+
     except urllib.error.HTTPError as error:
         print(
             f"Gemini API HTTP error: {error.code}",
             file=sys.stderr,
         )
-        raise
+
+        error_body = error.read().decode(
+            "utf-8", errors="replace"
+        )
+
+        try:
+            details = json.loads(error_body)
+            message = details.get("error", {}).get(
+                "message", "No error details provided"
+            )
+            print(
+                f"Gemini error details: {message}",
+                file=sys.stderr,
+            )
+        except json.JSONDecodeError:
+            print(
+                "Gemini returned a non-JSON error response.",
+                file=sys.stderr,
+            )
+
+        raise SystemExit(1)
 
     text = result["candidates"][0]["content"]["parts"][0]["text"]
     content = json.loads(text)
 
-    required = ["title", "description", "narration", "visual_keywords"]
+    required = [
+        "title",
+        "description",
+        "narration",
+        "visual_keywords",
+    ]
+
     if any(key not in content for key in required):
         raise ValueError("Gemini returned incomplete content")
 
@@ -116,7 +142,12 @@ Use US English. Avoid misleading claims.
     filename = f"output/{channel}_{video_type}.json"
 
     with open(filename, "w", encoding="utf-8") as file:
-        json.dump(content, file, ensure_ascii=False, indent=2)
+        json.dump(
+            content,
+            file,
+            ensure_ascii=False,
+            indent=2,
+        )
 
     print(f"Script generated: {filename}")
     print(f"Title: {content['title']}")
