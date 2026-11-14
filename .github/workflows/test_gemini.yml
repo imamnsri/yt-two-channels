@@ -24,13 +24,45 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: gemini-3.5-flash-lite
-        run: python scripts/generate_script.py vice_city short
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            echo "Vice City attempt $attempt of 5"
+
+            if python scripts/generate_script.py vice_city short; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 5 ]; then
+              echo "Gemini generation failed after 5 attempts."
+              exit 1
+            fi
+
+            echo "Waiting 30 seconds..."
+            sleep 30
+          done
 
       - name: Generate Kidzz Rhythm script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash-lite
-        run: python scripts/generate_script.py kidzz_rhythm long
+          GEMINI_MODEL: gemini-3.5-flash-lite
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            echo "Kidzz Rhythm attempt $attempt of 5"
+
+            if python scripts/generate_script.py kidzz_rhythm long; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 5 ]; then
+              echo "Gemini generation failed after 5 attempts."
+              exit 1
+            fi
+
+            echo "Waiting 30 seconds..."
+            sleep 30
+          done
 
       - name: Save generated scripts
         uses: actions/upload-artifact@v4
