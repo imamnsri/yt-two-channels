@@ -1,0 +1,25 @@
+
+name: Check YouTube Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-credentials:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify YouTube credentials
+        env:
+          VICE_CITY_TOKEN: ${{ secrets.VICE_CITY_TOKEN }}
+          KIDZZ_RHYTHM_TOKEN: ${{ secrets.KIDZZ_RHYTHM_TOKEN }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+        run: python scripts/check_setup.py
