@@ -64,7 +64,7 @@ Use US English.
 """
 
     model = os.environ.get(
-        "GEMINI_MODEL", "gemini-2.5-flash-lite"
+        "GEMINI_MODEL", "gemini-3.5-flash-lite"
     )
 
     url = (
