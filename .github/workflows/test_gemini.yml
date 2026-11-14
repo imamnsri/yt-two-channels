@@ -1,0 +1,38 @@
+
+name: Test Gemini AI Scripts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-gemini:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate Vice City script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/generate_script.py vice_city short
+
+      - name: Generate Kidzz Rhythm script
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/generate_script.py kidzz_rhythm long
+
+      - name: Save generated scripts
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-test-scripts
+          path: output/*.json
+          retention-days: 1
