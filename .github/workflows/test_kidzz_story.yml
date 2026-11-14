@@ -1,0 +1,56 @@
+
+name: Test Kidzz Rhythm Story
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate-story:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Edge TTS
+        run: python -m pip install edge-tts
+
+      - name: Generate original story
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-3.5-flash-lite
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5; do
+            if python scripts/generate_script.py kidzz_rhythm long; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 5 ]; then
+              exit 1
+            fi
+
+            sleep 30
+          done
+
+      - name: Generate story narration
+        run: python scripts/generate_voice.py kidzz_rhythm long
+
+      - name: Save story and audio
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidzz-story-test
+          path: |
+            output/kidzz_rhythm_long.json
+            output/kidzz_rhythm_long.mp3
+          retention-days: 3
+          if-no-files-found: error
