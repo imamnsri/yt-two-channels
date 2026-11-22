@@ -443,7 +443,7 @@ def process_comments(service, channel):
 def run_channel(key, mode, comments_only=False):
     config=CHANNELS[key]
     if mode == 'live' and config.get('production_enabled', True) is False:
-        print(f"HOLD {key}: production paused pending the requested singing and animation quality", flush=True)
+        print(f"HOLD {key}: production paused pending the requested video quality", flush=True)
         return
     service,channel=youtube(key)
     print(f"Verified {config['name']}: {channel['id']}",flush=True)

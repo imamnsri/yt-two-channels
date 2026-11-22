@@ -9,7 +9,8 @@
     "slots": [["short", "12:00"], ["long", "18:00"], ["short", "21:00"]],
     "research_queries": ["GTA 6", "GTA VI details"],
     "official_sources": ["https://www.rockstargames.com/VI", "https://www.rockstargames.com/newswire"],
-    "clips_enabled": false
+    "clips_enabled": false,
+    "production_enabled": false
   },
   "kidz": {
     "name": "Kidzz Rhythm",
