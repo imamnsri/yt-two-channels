@@ -101,3 +101,26 @@ python -m pip install -r requirements.txt
 python -m unittest discover -s tests
 python -m compileall -q scripts
 ```
+
+## Renew expired YouTube tokens on your PC
+
+On 22 November, the live credential check found Google rejecting a saved token as
+expired or revoked (`invalid_grant`). A prior JSON-only setup check is not enough.
+First select the same project at https://console.cloud.google.com/auth/audience and
+ensure the OAuth app is In production. Publishing it does not restore an already
+expired token: authorize again afterward.
+
+On your PC, update this repository, install requirements, put the existing Desktop
+OAuth `client_secret.json` in the project root, then run:
+
+```
+gh auth login
+python -m pip install -r requirements.txt
+python scripts/authorize_channels.py
+```
+
+Choose Vice City - Unlocked first, then Kidzz Rhythm. The script checks the actual
+channel identity and sends JSON directly to `gh secret set NAME --repo
+imamnsri/yt-two-channels` via stdin. It never prints refresh tokens or puts them in
+Git. The GTA consent includes the comment permission. Afterwards, rerun the live
+connection test before any private production-upload test.
