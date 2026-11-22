@@ -64,7 +64,7 @@ def youtube(key):
         raise RuntimeError(f'Expected exactly one channel for {key}')
     actual = items[0]
     expected = config.get('channel_id')
-    if (expected and actual['id'] != expected) or (not expected and actual['snippet']['title'].casefold() != config['name'].casefold()):
+    if (expected and actual['id'] != expected) or (not expected and actual['snippet']['title'].casefold() != config.get('authorization_name', config['name']).casefold()):
         raise RuntimeError(f'Channel identity mismatch for {key}; refusing upload')
     actual['_scopes'] = data.get('scopes') or []
     return service, actual

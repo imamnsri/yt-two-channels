@@ -13,6 +13,7 @@
   },
   "kidz": {
     "name": "Kidzz Rhythm",
+    "authorization_name": "Kidzz Rhythm New",
     "token_secret": "KIDZZ_RHYTHM_TOKEN",
     "voice": "en-US-AnaNeural",
     "made_for_kids": true,

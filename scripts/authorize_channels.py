@@ -29,7 +29,7 @@ def main():
         scopes=['https://www.googleapis.com/auth/youtube.upload','https://www.googleapis.com/auth/youtube.readonly']
         if key=='vicecity':
             scopes.append('https://www.googleapis.com/auth/youtube.force-ssl')
-        print(f"\nChoose YOUR channel: {config['name']}")
+        print(f"\nChoose YOUR channel: {config.get('authorization_name', config['name'])}")
         if key=='vicecity':
             print('This consent includes permission to add our first comments to our GTA videos.')
         input('Press Enter to open Google sign-in on this PC...')
@@ -44,7 +44,7 @@ def main():
         channel=items[0]
         print(f"Selected channel: {channel['snippet']['title']} ({channel['id']})")
         expected=config.get('channel_id')
-        if (expected and channel['id']!=expected) or (not expected and channel['snippet']['title'].casefold()!=config['name'].casefold()):
+        if (expected and channel['id']!=expected) or (not expected and channel['snippet']['title'].casefold()!=config.get('authorization_name', config['name']).casefold()):
             raise SystemExit('Wrong channel selected. Nothing saved; run again and choose the correct channel.')
         if not credentials.refresh_token:
             raise SystemExit('No refresh token returned. Nothing saved. Check existing app access in your Google account before retrying.')
