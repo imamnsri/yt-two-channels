@@ -1,0 +1,68 @@
+name: Daily videos
+on:
+  schedule:
+    - cron: '17 14 * * *'
+    - cron: '37 * * * *'
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Channel to run
+        type: choice
+        options: [vicecity, kidz, all]
+        default: vicecity
+      mode:
+        description: Test uploads stay private; live uploads request the configured publishing time
+        type: choice
+        options: [test, live]
+        default: test
+permissions:
+  contents: write
+concurrency:
+  group: daily-video-production
+  cancel-in-progress: false
+jobs:
+  produce:
+    if: github.event_name == 'workflow_dispatch' || vars.AUTOMATION_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: gemini-3.5-flash-lite
+      PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+      VICE_CITY_TOKEN: ${{ secrets.VICE_CITY_TOKEN }}
+      KIDZZ_RHYTHM_TOKEN: ${{ secrets.KIDZZ_RHYTHM_TOKEN }}
+      YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg fonts-dejavu-core
+      - run: pip install -r requirements.txt
+      - name: Configure history commits
+        run: |
+          git config user.name github-actions
+          git config user.email actions@github.com
+      - name: Generate, render and upload
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '17 14 * * *'
+        env:
+          TARGET_CHANNEL: ${{ inputs.channel || 'all' }}
+          UPLOAD_MODE: ${{ inputs.mode || 'live' }}
+        run: python -u scripts/daily.py --channel "$TARGET_CHANNEL" --mode "$UPLOAD_MODE"
+      - name: Post GTA first comments after scheduled videos become public
+        if: github.event_name == 'schedule' && github.event.schedule == '37 * * * *'
+        run: python -u scripts/daily.py --channel vicecity --comments-only
+      - name: Save scripts, research and upload receipts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-${{ github.run_id }}
+          path: |
+            output/**/*.json
+            output/*.json
+            history/*.json
+          if-no-files-found: ignore
+          retention-days: 7
