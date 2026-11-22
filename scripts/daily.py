@@ -203,13 +203,25 @@ Return JSON with title (max 85 chars), description (2-3 sentences), narration (p
 visual_query (2-4 words of stock footage search, Miami/nightlife/palm trees for GTA),
 first_comment (max 200 chars), factual_claims (array), scene_captions (8 short phrases describing
 this episode's actual progression, each max 7 words). No markdown. Do not reuse another creator's words.'''
-    meta = gemini(prompt)
-    for field in ('title', 'description', 'narration', 'visual_query'):
-        if not isinstance(meta.get(field), str) or not meta[field].strip():
-            raise ValueError(f'Missing generated field {field}')
-    words = len(meta['narration'].split())
-    if not target * .55 <= words <= target * 1.65:
-        raise ValueError(f'Generated narration length {words} outside requested range')
+    minimum_words = math.ceil(target * .55)
+    maximum_words = math.floor(target * 1.65)
+    for attempt in range(3):
+        meta = gemini(prompt)
+        for field in ('title', 'description', 'narration', 'visual_query'):
+            if not isinstance(meta.get(field), str) or not meta[field].strip():
+                raise ValueError(f'Missing generated field {field}')
+        words = len(meta['narration'].split())
+        if minimum_words <= words <= maximum_words:
+            break
+        print(f'Script length retry {attempt + 1}/3: {words} words; target {target}', flush=True)
+        prompt += (
+            f'\nYour previous narration contained {words} words. Return a complete replacement JSON. '
+            f'The narration field MUST contain between {minimum_words} and {maximum_words} '
+            f'spoken words, aiming for {target}. Expand or shorten the actual narration text '
+            'while retaining all originality and evidence requirements.'
+        )
+    else:
+        raise ValueError(f'Generated narration length {words} outside requested range after 3 attempts')
     if meta['title'].casefold() in {str(t).casefold() for t in past}:
         raise ValueError('Repeated title rejected')
     evidence = {source['url']: source['text'] for source in sources}
