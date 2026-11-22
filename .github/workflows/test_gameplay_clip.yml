@@ -1,0 +1,36 @@
+name: Review actual gameplay clip
+on:
+  workflow_dispatch:
+    inputs:
+      video_id:
+        description: CC-declared source video for a 20-second preview
+        required: true
+        default: dEtRIciPVU8
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: pip install -r requirements.txt yt-dlp yt-dlp-ejs
+      - name: Retrieve and crop a short gameplay excerpt for review
+        run: python -u scripts/prepare_gameplay_preview.py --video-id "$SOURCE_VIDEO_ID"
+        env:
+          SOURCE_VIDEO_ID: ${{ inputs.video_id }}
+          VICE_CITY_TOKEN: ${{ secrets.VICE_CITY_TOKEN }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: actual-gameplay-review
+          path: output/gameplay-preview/
+          if-no-files-found: error
+          retention-days: 3
