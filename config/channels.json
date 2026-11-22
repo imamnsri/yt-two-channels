@@ -22,6 +22,7 @@
     "slots": [["long", "15:00"]],
     "weekend_time": "09:00",
     "research_queries": ["original counting song toddlers", "preschool animal story"],
-    "content_mode": "narrated_story"
+    "content_mode": "narrated_story",
+    "production_enabled": false
   }
 }
