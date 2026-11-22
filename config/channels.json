@@ -14,6 +14,7 @@
   "kidz": {
     "name": "Kidzz Rhythm",
     "authorization_name": "Kidzz Rhythm New",
+    "channel_id": "UCDG0RTe-mustmkmkAvkyb7w",
     "token_secret": "KIDZZ_RHYTHM_TOKEN",
     "voice": "en-US-AnaNeural",
     "made_for_kids": true,

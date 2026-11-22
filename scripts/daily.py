@@ -152,22 +152,32 @@ def gemini(prompt):
     secret = os.getenv('GEMINI_API_KEY')
     if not secret:
         raise RuntimeError('Missing secret GEMINI_API_KEY')
-    model = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
-    endpoint = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
-    for attempt in range(5):
-        response = requests.post(endpoint, timeout=150, headers={'x-goog-api-key': secret}, json={
-            'contents': [{'parts': [{'text': prompt}]}],
-            'generationConfig': {'responseMimeType': 'application/json'},
-        })
-        if response.status_code in (429, 500, 502, 503, 504) and attempt < 4:
-            time.sleep(min(10 * (attempt + 1), 45))
-            continue
-        if not response.ok:
-            raise RuntimeError(f'Gemini generation failed: HTTP {response.status_code}')
-        result = response.json()
-        parts = result['candidates'][0]['content']['parts']
-        return json.loads(''.join(p.get('text', '') for p in parts if not p.get('thought')))
-    raise RuntimeError('Gemini retries exhausted')
+    primary = os.getenv('GEMINI_MODEL', 'gemini-3.5-flash-lite')
+    # Both text models have a Gemini Developer API free tier. No paid model is selected.
+    models = list(dict.fromkeys([primary, 'gemini-2.5-flash-lite']))
+    last_status = None
+    for model in models:
+        endpoint = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
+        for attempt in range(3):
+            response = requests.post(endpoint, timeout=150, headers={'x-goog-api-key': secret}, json={
+                'contents': [{'parts': [{'text': prompt}]}],
+                'generationConfig': {'responseMimeType': 'application/json'},
+            })
+            last_status = response.status_code
+            if response.ok:
+                result = response.json()
+                parts = result['candidates'][0]['content']['parts']
+                print(f'Script model: {model}', flush=True)
+                return json.loads(''.join(p.get('text', '') for p in parts if not p.get('thought')))
+            if response.status_code == 404:
+                break
+            if response.status_code not in (429, 500, 502, 503, 504):
+                raise RuntimeError(f'Gemini generation failed: HTTP {response.status_code}')
+            print(f'Gemini {model}: HTTP {response.status_code}, attempt {attempt + 1}/3', flush=True)
+            if attempt < 2:
+                time.sleep(10 * (attempt + 1))
+        print(f'Gemini {model} unavailable; checking remaining free-tier model', flush=True)
+    raise RuntimeError(f'Gemini generation failed after free-model retries: HTTP {last_status}')
 
 
 def generate(key, kind, past, inspiration, sources, index):
