@@ -48,7 +48,7 @@ def main():
             raise SystemExit('Wrong channel selected. Nothing saved; run again and choose the correct channel.')
         if not credentials.refresh_token:
             raise SystemExit('No refresh token returned. Nothing saved. Check existing app access in your Google account before retrying.')
-        if input(f"Type YES to update {config['token_secret']} for this channel: ").strip()!='YES':
+        if input(f"Type YES to update {config['token_secret']} for this channel: ").strip().upper()!='YES':
             print('Skipped; nothing saved.')
             continue
         data={'client_id':credentials.client_id,'client_secret':credentials.client_secret,
