@@ -7,5 +7,14 @@
   "mode": "live",
   "made_for_kids": true,
   "kind": "two-minute original animated color song",
-  "source_count": 4
+  "source_count": 4,
+  "youtube_status": {
+    "uploadStatus": "uploaded",
+    "privacyStatus": "private",
+    "publishAt": "2026-11-24T20:00:00Z",
+    "license": "youtube",
+    "embeddable": true,
+    "publicStatsViewable": true,
+    "selfDeclaredMadeForKids": true
+  }
 }
