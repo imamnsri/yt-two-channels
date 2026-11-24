@@ -8,5 +8,27 @@
     "publish_at": "2026-11-23T20:00:00Z",
     "title": "Dakshu Counts Butterflies | Counting Song for Kids | Kidzz Rhythm",
     "description": "Count one, two, three butterflies with Dakshu and his elephant friend! An original animated English counting song for preschool children.\n\nOriginal song and AI-generated cartoon animation created for Kidzz Rhythm. This is a 30-second introductory song."
+  },
+  {
+    "id": "dakshu-color-garden-002",
+    "channel": "kidz",
+    "quality_checked": true,
+    "source_urls": [
+      "https://gcdn.picsart.com/editing-temp/4d62d651-5257-446d-825a-a9d794d05969.mp4",
+      "https://gcdn.picsart.com/editing-temp/b5efb082-7cb4-49b6-97a1-024d3a8c4c25.mp4",
+      "https://gcdn.picsart.com/editing-temp/065b561b-f3a7-48fd-89e4-1fba373b8742.mp4",
+      "https://gcdn.picsart.com/editing-temp/8cfdbe96-573b-4651-b255-0b74597f826b.mp4"
+    ],
+    "duration_seconds": 120.093,
+    "publish_at": "2026-11-24T20:00:00Z",
+    "title": "Learn Colors with Dakshu! | Red, Blue & Yellow Song for Kids",
+    "description": "Sing and learn red, blue and yellow with Dakshu and his elephant friend in an original animated garden adventure!\n\n0:00 Hello and red apples\n0:30 Blue bird and ribbon\n1:00 Yellow flower and sunshine\n1:30 Let us find the colors together\n\nAn original English preschool song created for Kidzz Rhythm with Dakshu! AI-generated singing and cartoon animation. Made for kids.\n\nhttps://www.youtube.com/@KidzzRhythmwithdakshu\n\n#Dakshu #KidsSongs #LearnColors",
+    "kind": "two-minute original animated color song",
+    "checks": {
+      "sampled_visual_frames": true,
+      "full_lyrics_transcribed": true,
+      "audio_video_duration_verified": true
+    },
+    "generation_credits": 360
   }
 ]
