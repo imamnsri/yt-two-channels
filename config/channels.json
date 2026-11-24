@@ -6,24 +6,52 @@
     "voice": "en-US-GuyNeural",
     "made_for_kids": false,
     "category": "20",
-    "slots": [["short", "12:00"], ["long", "18:00"], ["short", "21:00"]],
-    "research_queries": ["GTA 6", "GTA VI details"],
-    "official_sources": ["https://www.rockstargames.com/VI", "https://www.rockstargames.com/newswire"],
+    "slots": [
+      [
+        "short",
+        "12:00"
+      ],
+      [
+        "long",
+        "18:00"
+      ],
+      [
+        "short",
+        "21:00"
+      ]
+    ],
+    "research_queries": [
+      "GTA 6",
+      "GTA VI details"
+    ],
+    "official_sources": [
+      "https://www.rockstargames.com/VI",
+      "https://www.rockstargames.com/newswire"
+    ],
     "clips_enabled": false,
     "production_enabled": false
   },
   "kidz": {
-    "name": "Kidzz Rhythm",
-    "authorization_name": "Kidzz Rhythm New",
+    "name": "Kidzz Rhythm with Dakshu!",
+    "authorization_name": "Kidzz Rhythm with Dakshu!",
     "channel_id": "UCDG0RTe-mustmkmkAvkyb7w",
     "token_secret": "KIDZZ_RHYTHM_TOKEN",
     "voice": "en-US-AnaNeural",
     "made_for_kids": true,
     "category": "24",
-    "slots": [["long", "15:00"]],
+    "slots": [
+      [
+        "long",
+        "15:00"
+      ]
+    ],
     "weekend_time": "09:00",
-    "research_queries": ["original counting song toddlers", "preschool animal story"],
-    "content_mode": "narrated_story",
-    "production_enabled": false
+    "research_queries": [
+      "original counting song toddlers",
+      "preschool animal story"
+    ],
+    "content_mode": "animated_original_song",
+    "production_enabled": false,
+    "handle": "@KidzzRhythmwithdakshu"
   }
 }
